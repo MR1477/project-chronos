@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use Project Chronos in your research, please cite it using the following metadata."
+title: "Project Chronos"
+abstract: >-
+  An independent, open scientific research initiative exploring
+  autonomous artificial intelligence, scientific discovery,
+  information preservation, distributed computing, and the
+  fundamental physics of time.
+authors:
+  - family-names: "Yavari"
+    given-names: "Reza"
+version: 0.1.0
+date-released: 2026-11-05
+url: "https://github.com/MR1477/project-chronos"
+license: Apache-2.0
+keywords:
+  - Artificial Intelligence
+  - Autonomous Research
+  - Scientific Computing
+  - Distributed Computing
+  - Information Theory
+  - Temporal Physics
+  - Open Research
