@@ -41,3 +41,6 @@ logs/
 
 # Ignore nested runtime log directories
 **/logs/
+
+# Chronos local runtime data
+/data/
