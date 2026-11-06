@@ -1,134 +1,110 @@
-# Project Chronos
+# Project Chronos — Software
 
-### An Open Scientific Initiative for AI, Knowledge, and the Physics of Time
+**Software version:** 0.1.0  
+**Project:** Project Chronos  
+**Status:** Initial development structure  
+**Target platform:** Raspberry Pi 5, 8 GB RAM
 
-**The future should inherit more knowledge than the present possesses.**
+## 1. Purpose
 
-Project Chronos is an independent, open scientific research initiative exploring the intersection of artificial intelligence, autonomous scientific discovery, information preservation, distributed computing, and the fundamental physics of time.
+This directory contains the software implementation of Project Chronos.
 
-Our long-term ambition is to develop a persistent, collaborative AI research infrastructure capable of accumulating knowledge, investigating difficult scientific questions, and supporting generations of researchers.
+The software is designed as a lightweight, modular, and portable infrastructure for artificial intelligence, scientific research, persistent knowledge, distributed communication, and long-term system continuity.
 
-We begin with a small, practical experiment. We aim to build something that can grow through open collaboration into an international research initiative.
+Individual components should be independently maintainable and replaceable without requiring a complete redesign of the system.
 
----
+## 2. Software Modules
 
-## Our Mission
+The software architecture is divided into the following modules:
 
-To advance scientific knowledge and artificial intelligence for the benefit of humanity.
+| Module | Responsibility |
+|---|---|
+| `core/` | Main application, orchestration, and system management |
+| `ai/` | AI model interfaces and integration |
+| `memory/` | Persistent scientific knowledge and research records |
+| `learning/` | Scientific source acquisition, indexing, and continuous learning |
+| `agents/` | Autonomous research agents and workflows |
+| `exchange/` | Chronos Exchange and generational information records |
+| `ctsi/` | Chronos Temporal Signal Interface |
+| `communication/` | Secure node communication and synchronization |
+| `security/` | Authentication, authorization, and data integrity |
+| `monitoring/` | System health, maintenance, and operational monitoring |
+| `tests/` | Automated and integration tests |
 
-We believe that scientific progress should not depend entirely on individual lifetimes, institutional boundaries, or the lifespan of particular technologies.
+## 3. Development Principles
 
-Project Chronos aims to explore how autonomous AI systems, persistent knowledge architectures, and distributed research networks can contribute to long-term scientific discovery.
+All software modules should follow these principles:
 
-## Research Directions
+1. Modular design and documented interfaces.
+2. Portability across hardware and operating systems.
+3. Minimal unnecessary dependencies.
+4. Persistent and independently accessible research records.
+5. Secure communication and controlled permissions.
+6. Reproducible development and testing.
+7. Version-controlled changes.
+8. Compatibility with distributed operation.
+9. Controlled and reversible updates.
+10. Clear separation between implemented and planned capabilities.
 
-Our initial research interests include:
+## 4. Initial Development Environment
 
-- **Autonomous AI Research:** Developing AI systems capable of conducting structured research, evaluating hypotheses, and continuously improving their research capabilities.
-- **Persistent Scientific Memory:** Building reliable systems for preserving, organizing, and retrieving scientific knowledge over long periods.
-- **Distributed Intelligence:** Exploring collaboration between independently operated AI research nodes.
-- **Information Theory and Causality:** Investigating the relationship between information, causality, and the structure of physical reality.
-- **Temporal Physics:** Studying time, spacetime, relativity, wormhole solutions, closed timelike curves, and related theoretical frameworks.
+The first development target is Chronos Node 001.
 
-## The Long-Term Scientific Question
+Initial hardware:
 
-One of the most ambitious questions motivating Project Chronos is:
+- Raspberry Pi 5
+- 8 GB RAM
+- 32 GB microSD
+- Raspberry Pi OS Lite 64-bit
+- SSH-based administration
 
-**Can information generated in the future ever be physically transferred to the past?**
+The initial implementation should remain lightweight and avoid requiring large local AI models or unnecessary server infrastructure.
 
-We are interested in investigating whether theoretical frameworks involving spacetime geometry, quantum information, and causality could provide any physically consistent mechanism for such information transfer.
+External computing resources may be integrated through modular interfaces when required.
 
-This is a speculative research direction, not an established scientific capability.
+## 5. Development Roadmap
 
-No experimentally verified method for transmitting information into the past is currently known. Project Chronos will approach this question through mathematical analysis, theoretical research, independent verification, and testable experiments.
+**Phase 1 — Core Foundation**
 
-A negative result is also a valuable scientific result.
+- Core application.
+- System configuration.
+- Logging and monitoring.
+- Initial AI interface.
 
-## Development Roadmap
+**Phase 2 — Scientific Memory**
 
-### Stage 1 — Pilot Infrastructure
+- Structured research records.
+- Document storage.
+- Source tracking.
+- Search and retrieval.
 
-Establish the first working Chronos node using a Raspberry Pi 5.
+**Phase 3 — Continuous Learning and Research**
 
-Develop the initial software architecture, persistent memory, local AI capabilities, research logging, and reproducible deployment process.
+- Scientific source acquisition.
+- Knowledge indexing.
+- Research agents.
+- Hypothesis and experiment records.
 
-Invite independent contributors to operate additional nodes and establish a central coordination and knowledge-sharing infrastructure.
+**Phase 4 — Communication and Preservation**
 
-### Stage 2 — International Research Network
+- Chronos Exchange.
+- Distributed synchronization.
+- Independent backups.
+- CTSI monitoring prototype.
 
-Expand the project into an international network of independently operated research nodes.
+**Phase 5 — Distributed Intelligence**
 
-Establish research groups, scientific review processes, reproducible experiments, and collaborative research activities.
+- Multiple AI models.
+- Independent Chronos nodes.
+- Parallel computing infrastructure.
+- Controlled autonomous research.
 
-### Stage 3 — Institutional Collaboration
+## 6. Implementation Status
 
-Build collaborations with universities, research institutions, AI laboratories, engineering organizations, and scientific communities.
+The modules listed above represent the intended software organization.
 
-Expand computational resources and research capabilities while preserving scientific independence and transparency.
+A module should be considered implemented only after its functionality has been developed, tested, and documented.
 
-### Stage 4 — Temporal Information Research
+Development will proceed incrementally, beginning with the smallest functional system and expanding as requirements become clear.
 
-Investigate the fundamental relationship between time, information, and causality.
-
-Explore whether any physically realizable mechanism could permit future-to-past information transfer, and develop methods to distinguish genuine physical phenomena from ordinary communication, artifacts, and experimental errors.
-
-This stage represents a long-term scientific ambition, not a guaranteed outcome.
-
-## Scientific Principles
-
-Project Chronos is committed to:
-
-1. Evidence over speculation.
-2. Reproducibility and independent verification.
-3. Transparency about limitations and failures.
-4. Open collaboration and knowledge sharing.
-5. Responsible development of artificial intelligence.
-6. Scientific independence from financial or institutional interests.
-7. The freedom to reject any hypothesis that fails scientific examination.
-
-We will not present theoretical possibilities as experimental facts or AI-generated hypotheses as scientific discoveries without verification.
-
-## Open Collaboration
-
-Project Chronos welcomes contributions from:
-
-- Artificial intelligence researchers
-- Physicists and mathematicians
-- Electrical and mechanical engineers
-- Computer scientists and software developers
-- Researchers in information theory and quantum computing
-- Independent researchers and scientific enthusiasts
-
-You do not need to belong to an institution to contribute.
-
-Our objective is to create an environment in which ideas are evaluated by their scientific merit rather than the identity or status of their authors.
-
-## Current Status
-
-**Project status:** Initial public launch and pilot development.
-
-**First hardware platform:** Raspberry Pi 5 (8 GB).
-
-**Project type:** Independent, open scientific research initiative.
-
-The project is at its beginning. Its software infrastructure, research processes, and distributed architecture are under development.
-
-## How to Participate
-
-You can support Project Chronos by:
-
-- Following the project's development.
-- Reviewing research ideas and scientific proposals.
-- Contributing software, documentation, and technical expertise.
-- Proposing experiments and research directions.
-- Sharing the project with researchers and interested communities.
-
-As the project develops, contribution guidelines and technical documentation will be published here.
-
-## Final Vision
-
-Project Chronos is intended to be a long-term scientific effort.
-
-Its success should not be measured by the recognition of its founders, but by the knowledge it helps create, preserve, and make accessible to future generations.
-
-**The work begins with one node. The vision belongs to humanity.**
+**The software must remain lightweight enough to move, but capable enough to grow.**
