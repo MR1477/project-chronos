@@ -38,3 +38,6 @@ dist/
 
 # Chronos runtime logs
 logs/
+
+# Ignore nested runtime log directories
+**/logs/
