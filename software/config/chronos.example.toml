@@ -1,0 +1,18 @@
+
+# Project Chronos — Example Configuration
+
+[node]
+id = "chronos-node-001"
+name = "Chronos Development Node"
+
+[core]
+version = "0.1.0"
+log_level = "INFO"
+
+[memory]
+data_directory = "data"
+
+[monitoring]
+enabled = true
+interval_seconds = 60
+
