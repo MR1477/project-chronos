@@ -35,3 +35,6 @@ htmlcov/
 # Local build artifacts
 build/
 dist/
+
+# Chronos runtime logs
+logs/
