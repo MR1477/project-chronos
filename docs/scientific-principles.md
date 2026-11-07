@@ -138,7 +138,7 @@ Scientific principles and research procedures may evolve as the project develops
 
 Changes must be documented and should strengthen scientific integrity, reproducibility, transparency, and responsible research.
 
-## Final Principle
+## Final Principle 
 
 **Project Chronos must never value a desired discovery more than the truth.**
 
