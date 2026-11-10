@@ -1,7 +1,8 @@
 
 """Project Chronos — Core application entry point."""
-
+import argparse
 import platform
+import signal
 import sys
 from pathlib import Path
 
@@ -10,6 +11,7 @@ if __package__:
     from .config import ConfigurationError, load_config
     from .logging_setup import setup_logging
     from .node_identity import NodeIdentityError, load_or_create_identity
+    from .runtime import ChronosRuntime, create_shutdown_handler
 else:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
     from software.core.config import ConfigurationError, load_config
@@ -18,6 +20,7 @@ else:
         NodeIdentityError,
         load_or_create_identity,
     )
+    from software.core.runtime import ChronosRuntime, create_shutdown_handler
 
 
 CHRONOS_VERSION = "0.1.0"
@@ -39,7 +42,7 @@ def get_system_info():
     }
 
 
-def main(config_path=None):
+def main(config_path=None, run_forever=False):
     """Initialize the Chronos Core application."""
 
     if config_path is None:
@@ -82,9 +85,59 @@ def main(config_path=None):
     logger.info("Python version: %s", info["python_version"])
     logger.info("Chronos Core initialized successfully")
 
+    if run_forever:
+        monitoring = config.get("monitoring", {})
+        interval = monitoring.get("interval_seconds", 60)
+
+        def heartbeat():
+            logger.info("Chronos heartbeat: %s", identity["node_id"])
+
+        try:
+            runtime = ChronosRuntime(
+                heartbeat=heartbeat,
+                interval_seconds=interval,
+            )
+            handler = create_shutdown_handler(runtime)
+            previous_handlers = {}
+
+            try:
+                for signum in (signal.SIGINT, signal.SIGTERM):
+                    previous_handlers[signum] = signal.getsignal(signum)
+                    signal.signal(signum, handler)
+
+                logger.info("Chronos Continuous Runtime starting")
+                runtime.run()
+            finally:
+                runtime.stop()
+                for signum, previous in previous_handlers.items():
+                    signal.signal(signum, previous)
+
+            logger.info("Chronos Continuous Runtime stopped")
+        except (TypeError, ValueError) as exc:
+            logger.error("Chronos runtime configuration error: %s", exc)
+            return 1
+
     return 0
 
 
+def cli(argv=None):
+    """Parse command-line arguments and launch Chronos."""
+    parser = argparse.ArgumentParser(
+        description="Project Chronos Core"
+    )
+
+    parser.add_argument(
+        "--continuous",
+        action="store_true",
+        help="Run Chronos continuously until shutdown",
+    )
+
+    args = parser.parse_args(argv)
+
+    return main(run_forever=args.continuous)
+
+
 if __name__ == "__main__":
+    sys.exit(cli())
     sys.exit(main())
 
