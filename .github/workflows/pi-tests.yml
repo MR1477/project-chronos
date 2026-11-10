@@ -9,6 +9,7 @@ permissions:
 jobs:
   pi-test:
     name: Raspberry Pi 5 Tests
+    environment: chronos-pi-trusted
     runs-on: [self-hosted, Linux, ARM64, chronos-pi]
     timeout-minutes: 10
 
