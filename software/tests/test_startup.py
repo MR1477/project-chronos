@@ -119,7 +119,16 @@ class TestChronosStartup(unittest.TestCase):
         self.assertEqual(result, 1)
         mock_logging.return_value.error.assert_called_once()
 
+    def test_cli_continuous_flag(self):
+    """CLI --continuous enables continuous runtime."""
+    from software.core.main import cli
 
+    with patch("software.core.main.main", return_value=0) as mocked_main:
+        result = cli(["--continuous"])
+
+    self.assertEqual(result, 0)
+    mocked_main.assert_called_once_with(run_forever=True)
+    
 if __name__ == "__main__":
     unittest.main()
 
