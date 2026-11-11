@@ -2,7 +2,7 @@
 
 **Module:** `software/memory/`  
 **Version:** 0.1.0  
-**Status:** Planned — not yet implemented
+**Status:** Experiment 001 pilot
 
 ## 1. Purpose
 
@@ -101,8 +101,55 @@ Initial development should prioritize:
 5. Backup and integrity verification.
 6. Support for future distributed synchronization.
 
-## 9. Implementation Status
+## 9. Experiment 001 — Persistent scientific memory
 
-This document defines the intended responsibilities and boundaries of Chronos Memory.
+Run these commands from the repository root with Python 3.11–3.13:
 
-No storage, retrieval, backup, or synchronization functionality should be considered implemented until it has been developed, tested, and documented.
+```sh
+python3 -m software.memory.cli ingest /path/to/study-notes.md
+python3 -m software.memory.cli search "lunar model"
+python3 -m software.memory.cli ask "What did Galileo, Kepler, and Newton contribute to our understanding of orbital motion?"
+```
+
+The default SQLite database is `data/memory/knowledge.sqlite3` in the checkout.
+The `data/` directory is ignored by Git. Place `--db /path/to/memory.sqlite3`
+before the command to use a different location. Each CLI invocation starts a
+fresh process. Keep the database in the same location to retrieve its notes
+after restart, even if the original Markdown file is no longer available.
+
+### Markdown input
+
+Use UTF-8 Markdown with a source description and numbered notes under headings
+that start with `## Chapter `. Each note goes on one line, with a bold title
+and a final inline HTTP(S) citation. IDs must be unique within each document.
+For example:
+
+```markdown
+# Study notes
+
+**Source** — Author, title, and edition.
+
+## Chapter 1 · Topic
+
+3. **Observation.** Record the observation in your own words. [Chapter 1, observation](https://example.org/source)
+```
+
+Ingest only notes you are authorized to store. The pilot imports cited notes
+under chapter headings. Introductory prose and the separate review-questions
+section stay in the Markdown file. Each file revision gets a document ID
+based on its content. Reimporting the identical file is idempotent, and
+revisions preserve the earlier notes.
+
+### Retrieval
+
+`search` returns JSON results ranked by exact keyword overlap in note titles
+and bodies. Each result retains the document ID, note number, source, chapter,
+and citation label and URL. `ask` returns a deterministic extractive response
+with cited notes. It reports insufficient evidence when the retrieved notes
+do not cover every significant query word.
+
+The pilot matches words, so synonyms and some paraphrases may require
+rephrasing the question. Word overlap alone cannot establish that a source
+entails a claim. The response reproduces the relevant stored notes for the
+reader to assess. The subsystem uses SQLite and the Python standard library,
+with no AI model or neural-network training.

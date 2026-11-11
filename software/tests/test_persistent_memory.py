@@ -72,6 +72,7 @@ class TestPersistentMemory(unittest.TestCase):
         before = self.successful_result("ask", QUESTION)
         self.assertEqual(before["status"], "supported")
         self.assertEqual({note["note_id"] for note in before["evidence"]}, {3, 4})
+        self.assertIn("**Galileo and Kepler.**", before["answer"])
         self.assertIn("Galileo saw moons orbiting Jupiter.", before["answer"])
         self.assertIn("Newton explained orbital motion using gravity.", before["answer"])
         self.assertIn(f"[Universal gravitation]({CITATION_URL})", before["answer"])
