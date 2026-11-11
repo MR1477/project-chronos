@@ -50,3 +50,12 @@ class TestChronosCLI(unittest.TestCase):
         self.assertEqual(result.stderr, "")
         self.assertFalse((self.project_root / "logs").exists())
         self.assertFalse((self.project_root / "data").exists())
+
+    def test_unknown_option_reports_usage_without_starting_core(self):
+        result = self.run_cli("--unknown-option")
+
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("usage:", result.stderr)
+        self.assertIn("unrecognized arguments: --unknown-option", result.stderr)
+        self.assertFalse((self.project_root / "logs").exists())
+        self.assertFalse((self.project_root / "data").exists())
