@@ -33,6 +33,11 @@ class LocalModelTests(unittest.TestCase):
         )
         self.assertIn("Stored excerpt 3.", str(self.complete.call_args))
         self.assertNotIn("https://example.org", str(self.complete.call_args))
+        response_format = self.complete.call_args.kwargs["response_format"]
+        self.assertEqual(response_format["type"], "json_schema")
+        schema = response_format["json_schema"]["schema"]
+        self.assertEqual(schema["required"], ["sources"])
+        self.assertEqual(schema["properties"]["sources"]["items"]["enum"], [1, 2])
 
     def test_invalid_model_output_is_rejected(self):
         for output in (
