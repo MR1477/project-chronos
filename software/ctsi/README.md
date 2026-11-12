@@ -2,8 +2,46 @@
 
 **Module:** `software/ctsi/`  
 **Version:** 0.1.0  
-**Status:** Planned — not yet implemented  
+**Status:** Experiment 002 local simulator implemented
 **Classification:** Experimental Research Infrastructure
+
+## Experiment 002 — Run the local simulator
+
+From the repository root with Python 3.11–3.13:
+
+```sh
+python3 -m software.ctsi.receiver --polls 3 --fail-first
+```
+
+The in-process endpoint opens no sockets. The command records a simulated
+timeout, an initial empty response, and a duplicate. Omit `--polls` to keep
+polling until Ctrl+C. To inject exact bytes from a local file, add
+`--signal-file PATH --control-id LABEL`. In Python, call
+`SimulatedEndpoint.inject()` between polls to change the held signal.
+Control IDs are supplied by the experiment operator.
+
+The default archive is `data/ctsi/observations.sqlite3`. Query the
+`observations` view to inspect the archive:
+
+```sql
+SELECT id, run_id, observed_utc, monotonic_ns, hex(payload), sha256,
+       control_id, error, classification
+FROM observations ORDER BY id;
+```
+
+Each poll commits a raw record with exact bytes and their SHA-256, or an
+error with no payload or hash. Classification compares each response
+against the last successful response in archive order, including across
+restarts. A change without a control ID is an unexplained simulated change.
+The receiver assigns a new run ID on startup. Use the row ID for archive
+order and monotonic timestamps within a run for elapsed timing. UTC can
+move backward or forward. The scheduler skips missed one-second ticks
+after an overrun.
+
+The archive uses SQLite transactions and rejects raw row updates, deletes,
+and replacements. New archive files are created with owner-only access.
+Keep the archive in a directory controlled by the operator. A user with
+write access to the database file can alter its schema or replace it.
 
 ## 1. Purpose
 
@@ -179,6 +217,6 @@ Initial development should prioritize:
 
 ## 11. Implementation Status
 
-This document defines the intended responsibilities and experimental requirements of CTSI.
+Experiment 002 implements the local simulated receiver described above. The remaining sections describe the broader CTSI design.
 
 No temporal signal reception or backward information transfer capability should be considered implemented or demonstrated until supported by independently verified experimental evidence.
