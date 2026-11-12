@@ -143,3 +143,57 @@ Changes must be documented and should strengthen scientific integrity, reproduci
 **Project Chronos must never value a desired discovery more than the truth.**
 
 Its purpose is not to prove a predetermined hypothesis, but to investigate difficult questions honestly and contribute whatever knowledge the evidence supports.
+
+---
+
+## Theory-Agnostic Scientific Exploration
+
+Project Chronos shall not depend on any single scientific theory, technological approach, or proposed mechanism for achieving its research objectives.
+
+Chronos will investigate multiple research pathways, including established scientific frameworks, emerging theories, unconventional hypotheses, mathematical models, computational simulations, and physical experiments.
+
+### Core Commitments
+
+1. **Scientific openness:** Relevant hypotheses may be proposed and examined without premature dismissal.
+
+2. **Evidence-based evaluation:** Hypotheses shall be assessed according to mathematical consistency, empirical evidence, testability, reproducibility, and scientific merit.
+
+3. **Parallel research:** Chronos should support independent and simultaneous investigation of multiple research directions.
+
+4. **Active experimentation:** Chronos shall not rely exclusively on hypothetical future technologies or future versions of itself. It should investigate experimentally accessible approaches in the present.
+
+5. **Continuous reassessment:** Research directions shall be revised, deprioritized, or rejected when evidence warrants it.
+
+6. **Preservation of negative results:** Unsuccessful experiments and falsified hypotheses shall be documented as valuable scientific findings.
+
+7. **Independent verification:** Extraordinary claims require rigorous controls, reproducible evidence, and independent confirmation.
+
+8. **Open collaboration:** Human researchers and AI-assisted systems may propose, evaluate, and challenge research approaches.
+
+### Temporal Information Research
+
+A central research question of Project Chronos is:
+
+**Can information be transferred between different points in time through any physically realizable mechanism, and if so, under what conditions?**
+
+Research may investigate:
+
+- Forward-time information preservation and transmission.
+- Hypothetical backward-time information transfer.
+- Causality and relativistic spacetime models.
+- Quantum information and foundational physics.
+- Thermodynamics, entropy, and information theory.
+- Computational and mathematical models of temporal processes.
+- Novel experimental methods and measurement technologies.
+- Other relevant hypotheses proposed through scientific research.
+
+These areas are research directions, not claims of demonstrated temporal communication.
+
+Chronos shall distinguish established physical phenomena from speculative proposals and shall not assume that backward-time communication is possible.
+
+### Long-Term Research Principle
+
+**Chronos shall remain open to new scientific pathways while remaining accountable to evidence.**
+
+No hypothesis shall become permanent doctrine, and no experimental claim shall be accepted solely because it supports the project's ambitions.
+
