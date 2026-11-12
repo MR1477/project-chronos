@@ -44,3 +44,7 @@ logs/
 
 # Chronos local runtime data
 /data/
+
+# Local language model weights
+*.gguf
+*.gguf.part
