@@ -105,14 +105,18 @@ class KnowledgeStore:
         if remaining:
             return {"status": "insufficient_evidence", "answer": NO_EVIDENCE, "evidence": []}
 
-        answer = []
-        for note in evidence:
-            citation = note["citation"]
-            answer.append(
-                f'**{note["title"]}** {note["text"]} '
-                f'[{citation["label"]}]({citation["url"]})'
-            )
-        return {"status": "supported", "answer": "\n\n".join(answer), "evidence": evidence}
+        return {"status": "supported", "answer": render_evidence(evidence), "evidence": evidence}
+
+
+def render_evidence(evidence):
+    answer = []
+    for note in evidence:
+        citation = note["citation"]
+        answer.append(
+            f'**{note["title"]}** {note["text"]} '
+            f'[{citation["label"]}]({citation["url"]})'
+        )
+    return "\n\n".join(answer)
 
 
 def query_terms(query):

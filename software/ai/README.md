@@ -99,3 +99,19 @@ The AI module provides intelligence services; it does not own the permanent scie
 This document defines the intended responsibilities and boundaries of Chronos AI.
 
 No AI model, inference service, or autonomous research capability should be considered implemented until it has been developed, tested, and documented.
+
+## Local model pilot
+
+With a recent llama.cpp CPU build and a verified Qwen3 GGUF stored outside the checkout, start the server on loopback:
+
+```sh
+llama-server --model /path/to/Qwen3-0.6B-Q4_K_M.gguf --host 127.0.0.1 --port 8080 --n-gpu-layers 0 --threads 4 --ctx-size 2048
+```
+
+Run the pilot against an existing Chronos memory database:
+
+```sh
+python3 -m software.ai.local_model --db /path/to/knowledge.sqlite3 "What did Galileo, Kepler, and Newton contribute to our understanding of orbital motion?"
+```
+
+Chronos reads SQLite in read-only mode. The model receives the question and candidate excerpts. It selects excerpt IDs, and Chronos renders the stored text and citations. Invalid IDs or malformed output cause the pilot to return no citations. Questions with insufficient retrieval evidence skip the model. This is an extractive RAG pilot with fixed model weights.
