@@ -120,6 +120,70 @@ class TestChronosStartup(unittest.TestCase):
         mock_logging.return_value.error.assert_called_once()
 
 
+
+    def test_continuous_runtime_startup(self):
+        """Continuous mode starts the runtime after initialization."""
+        self.write_config(
+            '[node]\nid = "test-node-001"\n'
+            '[core]\nlog_level = "INFO"\n'
+            '[monitoring]\ninterval_seconds = 60\n'
+        )
+
+        with (
+            patch("software.core.main.setup_logging"),
+            patch("software.core.main.load_or_create_identity") as identity,
+            patch("software.core.main.ChronosRuntime") as runtime_class,
+        ):
+            identity.return_value = {
+                "node_id": "test-uuid",
+                "created_at": "2026-11-06T00:00:00+00:00",
+            }
+
+            result = main(self.config_path, run_forever=True)
+
+        self.assertEqual(result, 0)
+        runtime_class.assert_called_once()
+        runtime_class.return_value.run.assert_called_once_with()
+
+
+
+    def test_continuous_runtime_registers_signals(self):
+        """Continuous mode registers graceful shutdown handlers."""
+        from signal import SIGINT, SIGTERM
+
+        self.write_config(
+            '[node]\nid = "test-node-001"\n'
+            '[core]\nlog_level = "INFO"\n'
+        )
+
+        with (
+            patch("software.core.main.setup_logging"),
+            patch("software.core.main.load_or_create_identity") as identity,
+            patch("software.core.main.ChronosRuntime"),
+            patch("software.core.main.signal.signal") as register_signal,
+        ):
+            identity.return_value = {"node_id": "test-uuid"}
+            result = main(self.config_path, run_forever=True)
+
+        self.assertEqual(result, 0)
+        registered = [call.args[0] for call in register_signal.call_args_list]
+        self.assertIn(SIGINT, registered)
+        self.assertIn(SIGTERM, registered)
+
+
+
+    def test_cli_continuous_flag(self):
+        """CLI --continuous enables continuous runtime."""
+        from software.core.main import cli
+
+        with patch("software.core.main.main", return_value=0) as mocked_main:
+            result = cli(["--continuous"])
+
+        self.assertEqual(result, 0)
+        mocked_main.assert_called_once_with(run_forever=True)
+
+
+
 if __name__ == "__main__":
     unittest.main()
 
