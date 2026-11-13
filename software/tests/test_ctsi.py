@@ -2,6 +2,7 @@ import hashlib
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -25,7 +26,7 @@ class ReceiverTests(unittest.TestCase):
         self.now += round(seconds * 1_000_000_000)
 
     def observations(self):
-        with sqlite3.connect(self.path) as connection:
+        with closing(sqlite3.connect(self.path)) as connection:
             connection.row_factory = sqlite3.Row
             return connection.execute("SELECT * FROM observations ORDER BY id").fetchall()
 
@@ -84,8 +85,61 @@ class ReceiverTests(unittest.TestCase):
     def test_raw_observations_reject_update_and_delete(self):
         with self.receiver() as receiver:
             receiver.poll()
-        with sqlite3.connect(self.path) as connection:
+        with closing(sqlite3.connect(self.path)) as connection:
             for statement in ("UPDATE raw_observations SET payload = NULL",
                               "DELETE FROM raw_observations"):
                 with self.assertRaises(sqlite3.IntegrityError):
                     connection.execute(statement)
+
+    def timings(self):
+        connection = sqlite3.connect(self.path)
+        try:
+            return connection.execute(
+                """SELECT observation_id, scheduled_ns, started_ns, ended_ns,
+                          lateness_ns, missed_ticks
+                   FROM poll_timing ORDER BY observation_id"""
+            ).fetchall()
+        finally:
+            connection.close()
+
+    def test_timing_records_late_wake_and_skipped_deadlines(self):
+        def oversleep(seconds):
+            self.sleep(seconds)
+            if self.now == 1_000_000_000:
+                self.now += 2_250_000_000
+
+        with Receiver(self.path, self.endpoint, monotonic_ns=lambda: self.now,
+                      utc_now=lambda: self.wall, sleep=oversleep) as receiver:
+            receiver.run(3)
+        self.assertEqual(self.timings(), [
+            (1, 0, 0, 0, 0, 0),
+            (2, 1_000_000_000, 3_250_000_000, 3_250_000_000, 2_250_000_000, 0),
+            (3, 4_000_000_000, 4_000_000_000, 4_000_000_000, 0, 2),
+        ])
+
+    def test_timing_records_poll_work_and_preserves_exact_deadline(self):
+        def endpoint():
+            self.now += 2_000_000_000
+            return self.endpoint()
+
+        with Receiver(self.path, endpoint, monotonic_ns=lambda: self.now,
+                      utc_now=lambda: self.wall, sleep=self.sleep) as receiver:
+            receiver.run(2)
+        self.assertEqual(self.timings(), [
+            (1, 0, 0, 2_000_000_000, 0, 0),
+            (2, 2_000_000_000, 2_000_000_000, 4_000_000_000, 0, 1),
+        ])
+
+    def test_legacy_observations_survive_timing_schema_creation(self):
+        with self.receiver() as receiver:
+            receiver.poll()
+        previous = self.observations()[0]
+        connection = sqlite3.connect(self.path)
+        try:
+            connection.execute("DROP TABLE IF EXISTS poll_timing")
+        finally:
+            connection.close()
+        with self.receiver() as receiver:
+            receiver.run(1)
+        self.assertEqual(self.observations()[0], previous)
+        self.assertEqual(self.timings(), [(2, 0, 0, 0, 0, 0)])
