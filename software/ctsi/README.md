@@ -243,3 +243,44 @@ Initial development should prioritize:
 Experiment 002 implements the local simulated receiver described above. The remaining sections describe the broader CTSI design.
 
 No temporal signal reception or backward information transfer capability should be considered implemented or demonstrated until supported by independently verified experimental evidence.
+
+## Experiment 002.2 — Storage latency
+
+Use a new output directory on the filesystem under test. On the Pi, confirm
+the backing device with `findmnt -T` before running:
+
+```sh
+python3 -m software.ctsi.benchmark /home/pi/ctsi-exp0022-trial --device mmcblk0
+```
+
+The benchmark runs two rotated rounds of 60 polls for direct FULL, direct
+NORMAL, and buffered FULL. It uses the default journal mode of fresh SQLite
+archives and verifies exact control bytes, SHA-256, observation order, and
+database integrity. System samples are approximate and device counters are
+system-wide. Compare each round separately to expose variation over time.
+
+The normal receiver continues to use the connection's SQLite default unless
+`--synchronous FULL` or `--synchronous NORMAL` is supplied explicitly.
+FULL requests stronger synchronization from SQLite. NORMAL may perform fewer
+syncs and has weaker power-loss guarantees, particularly in rollback journal
+mode on some filesystems. These runs do not test power loss or establish that
+the OS, filesystem, and device honored flushes.
+
+Use `--diagnostics` for JSON lines on standard error. The transaction clock
+starts just before SQLite's implicit transaction and ends after commit returns.
+Post-commit timing lives outside the archive because that timestamp is only
+known after the observation commits. Send diagnostics to a separate device
+or memory-backed destination when isolating archive-device latency. The
+benchmark currently logs to the tested filesystem, so diagnostic I/O can
+affect measurements.
+
+`--buffered 16 --diagnostics` enables the experimental FIFO writer. Acquired
+means the endpoint returned or raised a simulated error. Queued means admitted
+to volatile memory. Committed means SQLite returned successfully from commit.
+Durability after power loss is unverified. Queue delay includes preparation
+and handoff before the transaction. When the queue fills, the newest
+observation is dropped and logged with its sequence number. The capacity is
+an observation count, plus one write in flight. Normal completion or one
+interrupt drains the queue. A SQLite writer error is surfaced, and pending
+observations are reported as dropped. A hard stop can lose queued data and
+unflushed diagnostics.
