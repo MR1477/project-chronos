@@ -22,6 +22,24 @@ CREATE TABLE IF NOT EXISTS raw_observations (
     control_id TEXT,
     error TEXT
 );
+CREATE TABLE IF NOT EXISTS poll_timing (
+    observation_id INTEGER PRIMARY KEY REFERENCES raw_observations(id),
+    scheduled_ns INTEGER NOT NULL,
+    started_ns INTEGER NOT NULL,
+    ended_ns INTEGER NOT NULL,
+    lateness_ns INTEGER NOT NULL,
+    missed_ticks INTEGER NOT NULL
+);
+CREATE VIEW IF NOT EXISTS timing_diagnostics AS
+SELECT raw.run_id, COUNT(*) AS polls,
+       SUM(raw.error IS NOT NULL) AS poll_errors,
+       SUM(timing.lateness_ns > 0) AS late_polls,
+       SUM(timing.missed_ticks) AS missed_ticks,
+       MAX(timing.lateness_ns) AS max_lateness_ns,
+       MAX(timing.ended_ns - timing.started_ns) AS max_poll_ns
+FROM poll_timing AS timing
+JOIN raw_observations AS raw ON raw.id = timing.observation_id
+GROUP BY raw.run_id;
 CREATE INDEX IF NOT EXISTS successful_observations ON raw_observations(id)
     WHERE sha256 IS NOT NULL;
 CREATE TRIGGER IF NOT EXISTS reject_observation_update
@@ -103,7 +121,10 @@ class Receiver:
     def __exit__(self, *exc):
         self.connection.close()
 
-    def poll(self):
+    def poll(self, *, scheduled_ns=None, missed_ticks=0):
+        started_ns = self.monotonic_ns()
+        if scheduled_ns is None:
+            scheduled_ns = started_ns
         error = None
         try:
             payload, control_id = self.endpoint()
@@ -114,29 +135,38 @@ class Receiver:
         observed_utc = self.utc_now().astimezone(timezone.utc).isoformat(timespec="microseconds")
         sha256 = hashlib.sha256(payload).hexdigest() if payload is not None else None
         with self.connection:
-            self.connection.execute(
+            observation = self.connection.execute(
                 """INSERT INTO raw_observations
                    (run_id, observed_utc, monotonic_ns, payload, sha256, control_id, error)
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 (self.run_id, observed_utc, monotonic_ns, payload, sha256, control_id, error),
+            )
+            ended_ns = self.monotonic_ns()
+            self.connection.execute(
+                """INSERT INTO poll_timing
+                   (observation_id, scheduled_ns, started_ns, ended_ns,
+                    lateness_ns, missed_ticks)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (observation.lastrowid, scheduled_ns, started_ns, ended_ns,
+                 started_ns - scheduled_ns, missed_ticks),
             )
 
     def run(self, polls: int | None = None):
         """Poll immediately, then on one-second deadlines. Skip missed ticks."""
         deadline = self.monotonic_ns()
         completed = 0
+        missed = 0
         while polls is None or completed < polls:
             remaining = deadline - self.monotonic_ns()
             while remaining > 0:
                 self.sleep(remaining / SECOND_NS)
                 remaining = deadline - self.monotonic_ns()
-            self.poll()
+            self.poll(scheduled_ns=deadline, missed_ticks=missed)
             completed += 1
             deadline += SECOND_NS
             now = self.monotonic_ns()
-            if now > deadline:
-                missed = (now - deadline + SECOND_NS - 1) // SECOND_NS
-                deadline += missed * SECOND_NS
+            missed = max(0, (now - deadline + SECOND_NS - 1) // SECOND_NS)
+            deadline += missed * SECOND_NS
 
 
 def main():

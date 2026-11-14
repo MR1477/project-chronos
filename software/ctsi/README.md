@@ -43,6 +43,29 @@ and replacements. New archive files are created with owner-only access.
 Keep the archive in a directory controlled by the operator. A user with
 write access to the database file can alter its schema or replace it.
 
+## Experiment 002.1 — Poll timing
+
+Each new observation has a companion row in `poll_timing`. Both rows
+commit in the same transaction. Earlier observations remain readable
+and have no companion timing row.
+
+```sql
+SELECT * FROM timing_diagnostics;
+SELECT * FROM poll_timing ORDER BY observation_id;
+```
+
+The receiver uses a monotonic clock for scheduled deadlines, actual poll
+starts, and poll ends. The end is sampled after the raw observation insert
+and before the timing insert and SQLite commit. The scheduler checks the
+clock after commit, so slow commits can still contribute to skipped ticks.
+Start lateness is the difference between the actual start and its deadline.
+Even a small positive difference counts toward `late_polls`.
+
+A late wake still services its assigned deadline. Each row counts the
+intervening deadlines skipped before its assigned deadline. After the
+last poll of a bounded run, future deadlines are outside the run.
+Direct calls to `poll()` have a deadline equal to their start.
+
 ## 1. Purpose
 
 The Chronos Temporal Signal Interface (CTSI) is a dedicated experimental subsystem of Project Chronos designed to investigate the possibility of receiving information originating from a future time.

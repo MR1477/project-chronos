@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 
@@ -55,7 +56,7 @@ class TestPersistentMemory(unittest.TestCase):
         imported = self.successful_result("ingest", str(self.source))
         self.assertEqual(imported["notes"], 2)
         self.assertEqual(self.successful_result("ingest", str(self.source)), imported)
-        with sqlite3.connect(self.database) as connection:
+        with closing(sqlite3.connect(self.database)) as connection:
             self.assertEqual(connection.execute("PRAGMA quick_check").fetchone(), ("ok",))
 
         results = self.successful_result("search", "Jupiter")
